@@ -3,10 +3,11 @@ import CartList from "@/components/cartList";
 
 export default defineComponent({
   name: "Drawer",
-  setup() {
+  emits: ['toggleDrawer'],
+  setup(_props, {emit}) {
     
     return {
-
+        emit
     }
   },
   render() {
@@ -15,7 +16,9 @@ export default defineComponent({
             <div class="fixed top-0 left-0 h-full w-full bg-black z-10 opacity-70"></div>
             <div class="flex flex-col fixed top-0 right-0 h-full w-96 bg-white z-20 p-8">
                 <div class="flex items-center justify-between">
-                    <button class="p-1 opacity-30 hover:opacity-100 transition">
+                    <button class="p-1 opacity-30 hover:opacity-100 transition"
+                        onClick={() => this.emit('toggleDrawer') }
+                    >
                         <img class="" src="/images/arrow-next.svg" alt="" />
                     </button>
                     <h2 class="text-2-xl font-bold">Корзина</h2>

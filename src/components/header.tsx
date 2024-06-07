@@ -2,10 +2,11 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Header",
-  setup() {
+  emits: ['toggleDrawer'],
+  setup(_props, {emit}) {
     
     return {
-
+        emit
     }
   },
   render() {
@@ -19,7 +20,9 @@ export default defineComponent({
                 </div>
             </div>
             <ul class="flex items-center gap-10">
-                <li class="flex items-center gap-3 text-gray-500 hover:text-black cursor-pointer transition-colors">
+                <li class="flex items-center gap-3 text-gray-500 hover:text-black cursor-pointer transition-colors"
+                    onClick={() => this.emit('toggleDrawer')}
+                >
                     <img src="/images/cart.svg" alt="Корзина"/>
                     <b>1205 руб.</b>
                 </li>

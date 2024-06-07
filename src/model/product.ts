@@ -1,5 +1,11 @@
+export type ResponceParams = {
+    title?: string,
+    sortBy: string
+}
+
 export type Product = {
-    name: string,
+    id: number,
+    title: string,
     imageUrl: string,
     price: number
 }
