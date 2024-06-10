@@ -66,13 +66,13 @@ export default defineComponent({
                 const payload = {
                     productID: item.id
                 }
-                const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/favorites', payload)
                 item.isFavorite = true
+                const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/favorites', payload)
                 item.favoriteID = data.id
                 console.log(data)
             } else {
-                await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${item.favoriteID}`)
                 item.isFavorite = false
+                await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${item.favoriteID}`)
                 item.favoriteID = null
             }
         } catch(error) {
