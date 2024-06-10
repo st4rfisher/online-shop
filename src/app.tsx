@@ -3,7 +3,7 @@ import axios from "axios";
 import Header from "@/components/header";
 import CardList from "@/components/cardList";
 import Drawer from "@/components/drawer";
-import { type Product, type ResponceParams } from "@/model/product";
+import { type Product, type Favorite, type ResponceParams } from "@/model/product";
 
 export default defineComponent({
   name: "App",
@@ -24,7 +24,32 @@ export default defineComponent({
             }
             const { data } = await axios.get('https://a464207e3cbafe55.mokky.dev/products', { params })
             console.log(data)
-            items.value = data
+            items.value = data.map((object: Product) => ({
+                ...object,
+                isFavorite: false,
+                isAdded: false
+            }))
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    fetchFavorites = async () => {
+        try {
+            const { data: favorites } = await axios.get('https://a464207e3cbafe55.mokky.dev/favorites')
+            items.value = items.value.map((item: Product) => {
+                const favorite = favorites.find((favorite: Favorite) => favorite.productID === item.id)
+
+                if(!favorite) {
+                    return item
+                }
+
+                return {
+                    ...item,
+                    isFavorite: true, 
+                    favoriteID: favorite.id
+                }
+            })
+            console.log(items.value)
         } catch (error) {
             console.log(error)
         }
@@ -34,14 +59,37 @@ export default defineComponent({
     },
     onChangeSearchInput = (target: HTMLInputElement) => {
         filters.searchQuery = target.value
-        console.log(filters.searchQuery)
+    },
+    addToFavorite = async (item: Product) => {
+        try {
+            if(!item.isFavorite) {
+                const payload = {
+                    productID: item.id
+                }
+                const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/favorites', payload)
+                item.isFavorite = true
+                item.favoriteID = data.id
+                console.log(data)
+            } else {
+                await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${item.favoriteID}`)
+                item.isFavorite = false
+                item.favoriteID = null
+            }
+        } catch(error) {
+            console.log(error)
+        }
+        console.log(item)
     }
 
-    onMounted(fetchItems)
+    onMounted(async () => {
+       await fetchItems()
+       await fetchFavorites()
+    })
     watch(filters, fetchItems)
 
     return {
-        isDrawerOpen, items, onChangeSelect, onChangeSearchInput
+        isDrawerOpen, items, onChangeSelect, onChangeSearchInput,
+        addToFavorite
     }
   },
   render() {
@@ -78,7 +126,10 @@ export default defineComponent({
                         </div>
                     </div>
                     
-                    <CardList items={ this.items }/>
+                    <CardList 
+                        items={ this.items }
+                        onAddToFavorite={(item: Product) => this.addToFavorite(item)}
+                    />
                 </div>
             </div>
         </>
