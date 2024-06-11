@@ -1,4 +1,4 @@
-export type ResponceParams = {
+export type ResponseParams = {
     title?: string,
     sortBy: string
 }
