@@ -16,12 +16,11 @@ export default defineComponent({
     },
     render() {
         return (
-            <ul class="grid grid-cols-4 gap-5">
+            <ul class="grid grid-cols-4 gap-5" v-auto-animate>
                 {
                     this.items?.map((item: Product) => (
-                        <li>
+                        <li key={item.id}>
                             <Card
-                                key={item.id}
                                 data={{
                                     id: item.id,
                                     title: item.title,

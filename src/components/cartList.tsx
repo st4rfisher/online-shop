@@ -13,7 +13,7 @@ export default defineComponent({
   },
   render() {
     return (
-      <ul class="flex flex-col w-full h-full overflow-y-auto mt-6 mb-6">
+      <ul class="flex flex-col w-full h-full overflow-y-auto mt-6 mb-6" v-auto-animate>
         {
           this.cart?.map((item: Product) => (
             <li class="mt-2">
