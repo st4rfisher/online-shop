@@ -1,6 +1,7 @@
 import { defineComponent, type PropType, onMounted, inject } from "vue";
 import clsx from "clsx";
 import { type Product } from "@/model/product";
+import { useRoute } from "vue-router";
 
 export default defineComponent({
     name: "Card",
@@ -10,11 +11,12 @@ export default defineComponent({
         // isAdded: Boolean,
         // onClickAdd: Function,   
     },
-    emits: ['clickFavorite', 'clickAdd'],
+    emits: ['toggleFavorite', 'clickAdd'],
     setup(_props, { emit }) {
-
+        const route = useRoute()
+        
         return {
-            emit
+            emit, route
         }
     },
     render() {
@@ -27,7 +29,7 @@ export default defineComponent({
                     )}
                     src={ this.data?.isFavorite ? "/images/like-2.svg" : "/images/like-1.svg" }
                     alt= { this.data?.isFavorite ? "Убрать из закладок" : "Добавить в закладки" }
-                    onClick={ () => this.emit('clickFavorite') }
+                    onClick={ () => this.emit('toggleFavorite') }
                 />
                 <img class="w-full object-contain max-h-[205px]" src={`/images/${this.data?.imageUrl}`} alt={this.data?.title} />
                 <p class="mb-auto text-center">{ this.data?.title }</p>
@@ -36,15 +38,18 @@ export default defineComponent({
                         <span class="text-slate-400">Цена:</span>
                         <b>{ this.data?.price } руб.</b>
                     </div>
-                    <img class={ 
-                        clsx(
-                            !this.data?.isAdded && "opacity-40 hover:opacity-100",
-                            "cursor-pointer transition"
-                        )}
-                        src={ this.data?.isAdded ? "/images/checked.svg" : "/images/plus.svg" }
-                        onClick={() => this.emit('clickAdd')}
-                        alt={ this.data?.isAdded ? "Убрать из корзины" : "Добавить в корзину" }
-                    />
+                    {
+                        this.route.name === "home" &&
+                        <img class={ 
+                            clsx(
+                                !this.data?.isAdded && "opacity-40 hover:opacity-100",
+                                "cursor-pointer transition"
+                            )}
+                            src={ this.data?.isAdded ? "/images/checked.svg" : "/images/plus.svg" }
+                            onClick={() => this.emit('clickAdd') }
+                            alt={ this.data?.isAdded ? "Убрать из корзины" : "Добавить в корзину" }
+                        />
+                    }
                 </div>
             </div>
         )

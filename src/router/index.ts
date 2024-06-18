@@ -1,13 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Home from "@/views/home";
+import Favorites from "@/views/favorites";
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView
-    // },
+    {
+      path: '/',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: Favorites
+    },
     // {
     //   path: '/about',
     //   name: 'about',

@@ -1,13 +1,13 @@
 import { defineComponent, onMounted, type PropType, inject } from "vue";
 import Card from "@/components/card";
-import { type Product } from "@/model/product";
+import { type Product, type Favorite } from "@/model/product";
 
 export default defineComponent({
     name: "CardList",
     props: {
-        items: Array as PropType<Product[]>,
+        items: Array as PropType<Product[]>
     },
-    emits: ['addToFavorite', 'addToCart'],
+    emits: ['toggleFavorite', 'addToCart'],
     setup(_props, { emit }) {
         const { cardAddHandle } = inject('cart') as any
         return {
@@ -29,8 +29,8 @@ export default defineComponent({
                                     isFavorite: item.isFavorite,
                                     isAdded: item.isAdded
                                 }}
-                                onClickFavorite={() => this.emit('addToFavorite', item)}
-                                onClickAdd={() => this.cardAddHandle(item)}
+                                onToggleFavorite={ () => this.emit('toggleFavorite', item) }
+                                onClickAdd={ () => this.cardAddHandle(item) }
                             />
                         </li>
                     ))

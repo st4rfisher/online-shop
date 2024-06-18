@@ -15,6 +15,5 @@ export type Product = {
 
 export type Favorite = {
     id: number,
-    productID: number,
     product: Product
 }
