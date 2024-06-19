@@ -8,8 +8,7 @@ export default defineComponent({
   name: "App",
   setup() {
     const isDrawerOpen: Ref<boolean> = ref(false),
-    isCreatingOrder: Ref<boolean> = ref(false),
-    isOrderButtonDisabled: ComputedRef<boolean> = computed(() => cart.value.length === 0 || isCreatingOrder.value),
+
     cart: Ref<Product[]> = ref([]),
     totalPrice: ComputedRef<number> = computed(
         () => cart.value.reduce((total: number, item: Product) => total + item.price, 0)
@@ -17,21 +16,6 @@ export default defineComponent({
     vatPrice: ComputedRef<number> = computed(
         () => Math.round((totalPrice.value * 5) / 100)
     ),
-    createOrder = async () => {
-        isCreatingOrder.value = true
-        try {
-            const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/orders', {
-                items: cart.value,
-                totalPrice: totalPrice.value
-            })
-            cart.value = []
-            return data
-        } catch (error) {
-            console.log(error)
-        } finally {
-            isCreatingOrder.value = false
-        }
-    },
     removeFromCart = (item: Product) => {
         cart.value.splice(cart.value.indexOf(item), 1)
         item.isAdded = false
@@ -57,7 +41,7 @@ export default defineComponent({
     { deep: true })
 
     return {
-        isDrawerOpen, isCreatingOrder, isOrderButtonDisabled, cart, totalPrice, vatPrice, createOrder
+        isDrawerOpen, cart, totalPrice, vatPrice
     }
   },
   render() {
@@ -69,8 +53,6 @@ export default defineComponent({
                     totalPrice = { this.totalPrice }
                     vatPrice = { this.vatPrice }
                     onToggleDrawer={ () => this.isDrawerOpen = !this.isDrawerOpen }
-                    onCreateOrder={ () => this.createOrder() }
-                    isOrderButtonDisabled = { this.isOrderButtonDisabled }
                 />
             }
             
@@ -81,7 +63,6 @@ export default defineComponent({
                 />
                 <div class="p-10">
                     <router-view></router-view>
-                    {/* <Home/> */}
                 </div>
             </div>
         </>

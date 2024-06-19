@@ -1,20 +1,38 @@
-import { computed, defineComponent, type PropType } from "vue";
+import { defineComponent, type Ref, type ComputedRef, ref, computed, inject } from "vue";
 import CartList from "@/components/cartList";
-import { type Product } from "@/model/product";
 import clsx from "clsx";
+import axios from "axios";
 
 export default defineComponent({
   name: "Drawer",
   props: {
     totalPrice: Number,
-    vatPrice: Number,
-    isOrderButtonDisabled: Boolean
+    vatPrice: Number
   },
   emits: ['toggleDrawer', 'createOrder'],
-  setup(props, {emit}) {
-
+  setup(props, { emit }) {
+    const isOrderCreating: Ref<boolean> = ref(false),
+    currentOrderID: Ref<number | null> = ref(null),
+    isOrderButtonDisabled: ComputedRef<boolean> = computed(() => cart.value.length === 0 || isOrderCreating.value),
+    { cart } = inject('cart') as any,
+    createOrder = async () => {
+        isOrderCreating.value = true
+        try {
+            const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/orders', {
+                items: cart.value,
+                totalPrice: props.totalPrice
+            })
+            currentOrderID.value = data.id
+            cart.value = []
+            return data
+        } catch (error) {
+            console.log(error)
+        } finally {
+            isOrderCreating.value = false
+        }
+    }
     return {
-        emit
+        isOrderButtonDisabled, currentOrderID, emit, createOrder
     }
   },
   render() {
@@ -48,11 +66,18 @@ export default defineComponent({
                                 <b>{ this.vatPrice } руб.</b>
                             </div>
                         </div>
-                    </>
-                    
-                    : 
+                    </> 
+                    : (this.totalPrice === 0 && this.currentOrderID) ?
                     <div class="flex flex-col items-center m-auto">
-                        <img height="170" width="170" src="/images/package-icon.png" alt="Корзина пуста"/>
+                        <img height="170" width="170" src="/images/order-success-icon.png" alt="Корзина пуста"/>
+                        <h2 class="mt-4 text-2xl font-medium">Заказ оформлен!</h2>
+                        <p class="text-gray-400 text-center mt-2">
+                           Ваш заказ №{this.currentOrderID} скоро будет передан курьерской службе доставки
+                        </p>
+                    </div>
+                    :
+                    <div class="flex flex-col items-center m-auto">
+                        <img src="/images/package-icon.png" alt="Корзина пуста"/>
                         <h2 class="mt-4 text-2xl font-medium">Корзина пустая</h2>
                         <p class="text-gray-400 text-center mt-2">
                             Необходимо добавить товары из каталога, 
@@ -70,7 +95,7 @@ export default defineComponent({
                             "transition w-full rounded-xl text-white py-3 mt-4"
                         )
                     }
-                    onClick={ () => this.emit('createOrder') }
+                    onClick={ () => this.createOrder() }
                 >
                     Оформить заказ
                 </button>
