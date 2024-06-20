@@ -1,14 +1,17 @@
 import { defineComponent, inject } from "vue";
 import CartItem from "@/components/cartItem";
 import { type Product } from "@/model/product";
+import { storeToRefs } from 'pinia'
+import { useCartStore } from "@/stores/cart/store";
 
 export default defineComponent({
   name: "CartList",
   setup() {
-    const { cart, removeFromCart } = inject('cart') as any
+    const cartStore = useCartStore(),
+    { cart } = storeToRefs(cartStore)
 
     return {
-      cart, removeFromCart
+      cartStore, cart
     }
   },
   render() {
@@ -19,7 +22,7 @@ export default defineComponent({
             <li class="mt-2">
               <CartItem 
                 data={ item }
-                onRemoveFromCart={ () => this.removeFromCart(item)}
+                onRemoveFromCart={ () => this.cartStore.removeFromCart(item)}
               />
             </li>
           ))

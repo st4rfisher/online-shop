@@ -1,38 +1,26 @@
-import { defineComponent, type Ref, type ComputedRef, ref, computed, inject } from "vue";
-import CartList from "@/components/cartList";
+import { defineComponent, type ComputedRef, computed } from "vue";
 import clsx from "clsx";
-import axios from "axios";
+import { storeToRefs } from 'pinia'
+
+import { useCartStore } from "@/stores/cart/store";
+import CartList from "@/components/cartList";
 
 export default defineComponent({
   name: "Drawer",
-  props: {
-    totalPrice: Number,
-    vatPrice: Number
-  },
-  emits: ['toggleDrawer', 'createOrder'],
-  setup(props, { emit }) {
-    const isOrderCreating: Ref<boolean> = ref(false),
-    currentOrderID: Ref<number | null> = ref(null),
-    isOrderButtonDisabled: ComputedRef<boolean> = computed(() => cart.value.length === 0 || isOrderCreating.value),
-    { cart } = inject('cart') as any,
-    createOrder = async () => {
-        isOrderCreating.value = true
-        try {
-            const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/orders', {
-                items: cart.value,
-                totalPrice: props.totalPrice
-            })
-            currentOrderID.value = data.id
-            cart.value = []
-            return data
-        } catch (error) {
-            console.log(error)
-        } finally {
-            isOrderCreating.value = false
-        }
-    }
+  emits: ['toggleDrawer'],
+  setup(_props, { emit }) {
+    const cartStore = useCartStore(),
+    { cart, totalPrice, vatPrice, currentOrderID, isOrderCreating } = storeToRefs(cartStore),
+    isOrderButtonDisabled: ComputedRef<boolean> = computed(() => cart.value.length === 0 || isOrderCreating.value)
+    
     return {
-        isOrderButtonDisabled, currentOrderID, emit, createOrder
+        cartStore, 
+        totalPrice, 
+        vatPrice, 
+        currentOrderID, 
+        isOrderCreating, 
+        isOrderButtonDisabled, 
+        emit
     }
   },
   render() {
@@ -95,7 +83,7 @@ export default defineComponent({
                             "transition w-full rounded-xl text-white py-3 mt-4"
                         )
                     }
-                    onClick={ () => this.createOrder() }
+                    onClick={ () => this.cartStore.createOrder() }
                 >
                     Оформить заказ
                 </button>

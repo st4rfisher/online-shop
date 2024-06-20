@@ -7,9 +7,6 @@ export default defineComponent({
     name: "Card",
     props: {
         data: Object as PropType<Product>,
-        // isFavorite: Boolean,
-        // isAdded: Boolean,
-        // onClickAdd: Function,   
     },
     emits: ['toggleFavorite', 'clickAdd'],
     setup(_props, { emit }) {
@@ -38,18 +35,15 @@ export default defineComponent({
                         <span class="text-slate-400">Цена:</span>
                         <b>{ this.data?.price } руб.</b>
                     </div>
-                    {
-                        this.route.name === "home" &&
-                        <img class={ 
-                            clsx(
-                                !this.data?.isAdded && "opacity-40 hover:opacity-100",
-                                "cursor-pointer transition"
-                            )}
-                            src={ this.data?.isAdded ? "/images/checked.svg" : "/images/plus.svg" }
-                            onClick={() => this.emit('clickAdd') }
-                            alt={ this.data?.isAdded ? "Убрать из корзины" : "Добавить в корзину" }
-                        />
-                    }
+                    <img class={ 
+                        clsx(
+                            !this.data?.isAdded && "opacity-40 hover:opacity-100",
+                            "cursor-pointer transition"
+                        )}
+                        src={ this.data?.isAdded ? "/images/checked.svg" : "/images/plus.svg" }
+                        onClick={() => this.emit('clickAdd') }
+                        alt={ this.data?.isAdded ? "Убрать из корзины" : "Добавить в корзину" }
+                    />
                 </div>
             </div>
         )

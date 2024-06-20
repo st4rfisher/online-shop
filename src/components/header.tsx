@@ -1,15 +1,16 @@
-import { computed, defineComponent } from "vue";
+import { defineComponent } from "vue";
+import { storeToRefs } from 'pinia'
+import { useCartStore } from "@/stores/cart/store";
 
 export default defineComponent({
   name: "Header",
-  props: {
-    totalPrice: Number
-  },
   emits: ['toggleDrawer'],
   setup(_props, {emit}) {
-    
+    const cartStore = useCartStore(),
+    { totalPrice } = storeToRefs(cartStore)
+
     return {
-        emit
+        totalPrice, emit
     }
   },
   render() {

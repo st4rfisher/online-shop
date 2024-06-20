@@ -1,6 +1,9 @@
 import { defineComponent, onMounted, type PropType, inject } from "vue";
-import Card from "@/components/card";
+import { storeToRefs } from 'pinia'
+
 import { type Product, type Favorite } from "@/model/product";
+import { useCartStore } from "@/stores/cart/store";
+import Card from "@/components/card";
 
 export default defineComponent({
     name: "CardList",
@@ -9,9 +12,10 @@ export default defineComponent({
     },
     emits: ['toggleFavorite', 'addToCart'],
     setup(_props, { emit }) {
-        const { cardAddHandle } = inject('cart') as any
+        const cartStore = useCartStore()
+
         return {
-            emit, cardAddHandle
+            emit, cartStore
         }
     },
     render() {
@@ -30,7 +34,7 @@ export default defineComponent({
                                     isAdded: item.isAdded
                                 }}
                                 onToggleFavorite={ () => this.emit('toggleFavorite', item) }
-                                onClickAdd={ () => this.cardAddHandle(item) }
+                                onClickAdd={ () => this.cartStore.cardAddHandle(item) }
                             />
                         </li>
                     ))
