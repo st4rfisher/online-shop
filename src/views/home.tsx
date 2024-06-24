@@ -16,8 +16,6 @@ export default defineComponent({
     favoritesStore = useFavoritesStore(),
     cartStore = useCartStore(),
     { items } = storeToRefs(catalogStore),
-    { cart } = storeToRefs(cartStore),
-
     onChangeSelect = (target: HTMLSelectElement) => {
         filtersStore.setSortBy(target.value)
     },
@@ -25,26 +23,20 @@ export default defineComponent({
         filtersStore.setSearchQuery(target.value)
     }
     onMounted(async () => {
-        const localCart = localStorage.getItem('cart')
-        cart.value = localCart ? JSON.parse(localCart) : []
-
+        await cartStore.setCart()
         await catalogStore.fetchItems()
         await favoritesStore.fetchFavorites()
-
-        items.value = items.value.map((item: Product) => ({
-            ...item,
-            isAdded: cart.value.some((cartItem: Product) => cartItem.id === item.id)
-        }))
+        await catalogStore.updateCatalog()
     })
 
     watch(filtersStore.filters, catalogStore.fetchItems)
 
-    watch(cart, () => {
-        items.value = items.value.map((item: Product) => ({
-            ...item,
-            isAdded: false
-        }))
-    })
+    // watch(cart, () => {
+    //     items.value = items.value.map((CatalogItem: Product) => ({
+    //         ...CatalogItem,
+    //         isAdded: false
+    //     }))
+    // })
 
     return {
         items, favoritesStore, cartStore, onChangeSelect, onChangeSearchInput, 

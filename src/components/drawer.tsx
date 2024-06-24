@@ -12,7 +12,7 @@ export default defineComponent({
     const cartStore = useCartStore(),
     { cart, totalPrice, vatPrice, currentOrderID, isOrderCreating } = storeToRefs(cartStore),
     isOrderButtonDisabled: ComputedRef<boolean> = computed(() => cart.value.length === 0 || isOrderCreating.value)
-    
+
     return {
         cartStore, 
         totalPrice, 

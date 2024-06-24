@@ -5,6 +5,7 @@ import { type Product } from "@/model/product";
 
 export const useCartStore = defineStore('cart', () => {
     const cart: Ref<Product[]> = ref([]),
+    localCart = localStorage.getItem('cart'),
     totalPrice: ComputedRef<number> = computed(
         () => cart.value.reduce((total: number, item: Product) => total + item.price, 0)
     ),
@@ -14,16 +15,20 @@ export const useCartStore = defineStore('cart', () => {
     isOrderCreating: Ref<boolean> = ref(false),
     currentOrderID: Ref<number | null> = ref(null)
 
-    function removeFromCart(item: Product) {
-        cart.value.splice(cart.value.indexOf(item), 1)
-        item.isAdded = false
+    async function setCart() {
+        cart.value = localCart ? JSON.parse(localCart) : []
     }
 
     function addToCart(item: Product) {
         cart.value.push(item)
         item.isAdded = true
     }
-    
+
+    function removeFromCart(item: Product) {
+        cart.value.splice(cart.value.indexOf(item), 1)
+        item.isAdded = false
+    }
+
     function cardAddHandle(item: Product) {
         !item.isAdded ? addToCart(item) : removeFromCart(item)
     }
@@ -51,9 +56,10 @@ export const useCartStore = defineStore('cart', () => {
         vatPrice,
         isOrderCreating,
         currentOrderID,
-        createOrder, 
+        setCart,
         addToCart, 
         removeFromCart, 
-        cardAddHandle 
+        cardAddHandle,
+        createOrder    
     }
 })
