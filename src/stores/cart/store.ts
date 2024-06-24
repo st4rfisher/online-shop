@@ -15,7 +15,7 @@ export const useCartStore = defineStore('cart', () => {
     isOrderCreating: Ref<boolean> = ref(false),
     currentOrderID: Ref<number | null> = ref(null)
 
-    async function setCart() {
+    async function initCart() {
         cart.value = localCart ? JSON.parse(localCart) : []
     }
 
@@ -56,7 +56,7 @@ export const useCartStore = defineStore('cart', () => {
         vatPrice,
         isOrderCreating,
         currentOrderID,
-        setCart,
+        initCart,
         addToCart, 
         removeFromCart, 
         cardAddHandle,

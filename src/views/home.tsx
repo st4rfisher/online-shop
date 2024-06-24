@@ -22,21 +22,15 @@ export default defineComponent({
     onChangeSearchInput = (target: HTMLInputElement) => {
         filtersStore.setSearchQuery(target.value)
     }
+    
     onMounted(async () => {
-        await cartStore.setCart()
+        await cartStore.initCart()
         await catalogStore.fetchItems()
         await favoritesStore.fetchFavorites()
-        await catalogStore.updateCatalog()
+        await catalogStore.updateItems()
     })
 
     watch(filtersStore.filters, catalogStore.fetchItems)
-
-    // watch(cart, () => {
-    //     items.value = items.value.map((CatalogItem: Product) => ({
-    //         ...CatalogItem,
-    //         isAdded: false
-    //     }))
-    // })
 
     return {
         items, favoritesStore, cartStore, onChangeSelect, onChangeSearchInput, 

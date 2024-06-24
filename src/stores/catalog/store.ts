@@ -1,5 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 import axios from "axios";
 import { type Product, type ResponseParams } from "@/model/product";
 import { useFiltersStore } from "@/stores/catalog/filters";
@@ -30,13 +30,20 @@ export const useCatalogStore = defineStore('catalog', () => {
             console.log(error)
         }
     }
-
-    async function updateCatalog() {
+    
+    async function updateItems() {
         items.value = items.value.map((catalogItem: Product) => ({
             ...catalogItem,
             isAdded: cart.value.some((cartItem: Product) => cartItem.id === catalogItem.id)
         }))
     }
 
-    return { items, fetchItems, updateCatalog }
+    watch(cart, () => {
+        items.value = items.value.map((CatalogItem: Product) => ({
+            ...CatalogItem,
+            isAdded: false
+        }))
+    })
+
+    return { items, fetchItems, updateItems }
 })
