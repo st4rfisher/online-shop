@@ -1,16 +1,19 @@
-import { defineComponent } from "vue";
-import { storeToRefs } from 'pinia'
+import { defineComponent, type ComputedRef, computed } from "vue";
+import { storeToRefs } from 'pinia';
 import { useCartStore } from "@/stores/cart/store";
+import { useFavoritesStore } from "@/stores/favorites/store";
 
 export default defineComponent({
   name: "Header",
   emits: ['toggleDrawer'],
   setup(_props, {emit}) {
     const cartStore = useCartStore(),
-    { totalPrice } = storeToRefs(cartStore)
+    favoritesStore = useFavoritesStore(),
+    { totalPrice } = storeToRefs(cartStore),
+    { favorites } = storeToRefs(favoritesStore)
 
     return {
-        totalPrice, emit
+        totalPrice, favorites, emit
     }
   },
   render() {
@@ -37,9 +40,14 @@ export default defineComponent({
                     }
                 </li>
                 <li>
-                    <router-link class="flex items-center gap-3 text-gray-500 hover:text-black cursor-pointer transition-colors" to="/favorites">
-                        <img src="/images/heart.svg" alt="Закладки"/>
+                    <router-link class="relative flex items-center gap-3 hover:text-black cursor-pointer text-gray-500 transition-colors" to="/favorites">
+                        <img src="/images/heart.svg" alt="Закладки"
+                        />
                         <span>Закладки</span>
+                        {
+                            this.favorites.length > 0 &&
+                            <b class="absolute left-4 -bottom-2 text-red-500 text-xs">{ this.favorites.length }</b>
+                        }
                     </router-link>
                 </li>
                 <li class="flex items-center gap-3 text-gray-500 hover:text-black cursor-pointer transition-colors">

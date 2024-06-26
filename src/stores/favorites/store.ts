@@ -5,31 +5,16 @@ import { type Favorite, type Product } from "@/model/product";
 import { useCatalogStore } from "@/stores/catalog/store";
 
 export const useFavoritesStore = defineStore('favorites', () => {
-    const favorites: Ref<Favorite[]> = ref([]),
-    catalogStore = useCatalogStore(),
-    { items } = storeToRefs(catalogStore)
+    const favorites: Ref<Favorite[]> = ref([])
 
     async function fetchFavorites() {
         try {
             const { data } = await axios.get('https://a464207e3cbafe55.mokky.dev/favorites')
-
-            items.value = items.value.map((item: Product) => {
-                const favorite = data.find((favorite: Favorite) => favorite.product.id === item.id)
-
-                if(!favorite) {
-                    return item
-                }
-
-                return {
-                    ...item,
-                    isFavorite: true, 
-                    favoriteID: favorite.id
-                }
-            })
-            console.log("Favorites from Server", data)
-        } catch (error) {
+            favorites.value = data
+            console.log(data)
+          } catch (error) {
             console.log(error)
-        }
+          }
     }
 
     async function toggleFavorite(item: Product) {
@@ -41,11 +26,13 @@ export const useFavoritesStore = defineStore('favorites', () => {
                 item.isFavorite = true
                 const { data } = await axios.post('https://a464207e3cbafe55.mokky.dev/favorites', payload)
                 item.favoriteID = data.id
+                fetchFavorites()
                 console.log(data)
             } else {
                 item.isFavorite = false
                 await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${item.favoriteID}`)
                 item.favoriteID = null
+                fetchFavorites()
             }
         } catch(error) {
             console.log(error)
@@ -53,5 +40,19 @@ export const useFavoritesStore = defineStore('favorites', () => {
         console.log(item)
     }
 
-    return { favorites, fetchFavorites, toggleFavorite }
+    async function removeFromFavorites(item: Product) {
+        console.log(item)
+        const currentFavorite = favorites.value.find((favorite: Favorite) => item.id === favorite.product.id) as Favorite
+        try {
+          item.isFavorite = false
+          await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${currentFavorite.id}`)
+          item.favoriteID = null
+          await fetchFavorites()
+          
+        } catch(error) {
+            console.log(error)
+        }
+    }
+
+    return { favorites, fetchFavorites, toggleFavorite, removeFromFavorites }
 })

@@ -22,12 +22,12 @@ export default defineComponent({
     onChangeSearchInput = (target: HTMLInputElement) => {
         filtersStore.setSearchQuery(target.value)
     }
-    
+
     onMounted(async () => {
         await cartStore.initCart()
         await catalogStore.fetchItems()
-        await favoritesStore.fetchFavorites()
-        await catalogStore.updateItems()
+        await catalogStore.updateItemsInCart()
+        await catalogStore.updateItemsInFavorites()
     })
 
     watch(filtersStore.filters, catalogStore.fetchItems)
@@ -60,7 +60,9 @@ export default defineComponent({
         
         <CardList 
             items={ this.items }
-            onToggleFavorite={ (item: Product) => this.favoritesStore.toggleFavorite(item) }
+            onToggleFavorite={ (item: Product) => { 
+                this.favoritesStore.toggleFavorite(item)
+            } }
             onAddToCart={ (item: Product) => this.cartStore.addToCart(item) }
         />
       </>

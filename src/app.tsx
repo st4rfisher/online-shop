@@ -1,22 +1,26 @@
-import { defineComponent, ref, watch, type Ref } from "vue";
+import { defineComponent, ref, watch, type Ref, onMounted } from "vue";
 import { storeToRefs } from 'pinia'
 
 import { useCartStore } from "@/stores/cart/store";
+import { useFavoritesStore } from "@/stores/favorites/store";
 import Header from "@/components/header";
 import Drawer from "@/components/drawer";
 
 export default defineComponent({
   name: "App",
   setup() {
-    const isDrawerOpen: Ref<boolean> = ref(false)
-    const cartStore = useCartStore(),
+    const isDrawerOpen: Ref<boolean> = ref(false),
+    cartStore = useCartStore(),
+    favoritesStore = useFavoritesStore(),
     { cart } = storeToRefs(cartStore)
+
+    onMounted(async () => favoritesStore.fetchFavorites())
 
     watch(cart, () => {
         localStorage.setItem('cart', JSON.stringify(cart.value))
     }, 
     { deep: true })
-    
+
     return {
         isDrawerOpen
     }

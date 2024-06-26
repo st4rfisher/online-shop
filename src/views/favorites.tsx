@@ -1,46 +1,19 @@
-import { defineComponent, onMounted, ref, type Ref } from "vue";
-import axios from "axios";
-import CardList from "@/components/cardList";
+import { defineComponent, onMounted, type ComputedRef, computed, watch } from "vue";
+import { storeToRefs } from 'pinia'
+
 import { type Favorite, type Product } from "@/model/product";
+import { useFavoritesStore } from "@/stores/favorites/store";
+import CardList from "@/components/cardList";
 
 export default defineComponent({
   name: "Favorites",
   setup() {
-    const favorites: Ref<Favorite[]> = ref([]),
-    products: Ref<Product[]> = ref([]),
-    fetchFavorites = async () => {
-      try {
-        const { data } = await axios.get('https://a464207e3cbafe55.mokky.dev/favorites')
-        products.value = data.map((object: Favorite) => object.product)
-        favorites.value = data
-        console.log(data)
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    toggleFavorite = async (item: Product) => {
-      console.log(item)
-      const currentFavorite = favorites.value.find((favorite: Favorite) => item.id === favorite.product.id) as Favorite
-      try {
-        item.isFavorite = false
-        await axios.delete(`https://a464207e3cbafe55.mokky.dev/favorites/${currentFavorite.id}`)
-        item.favoriteID = null
-        fetchFavorites()
-      } catch(error) {
-          console.log(error)
-      }
-    }
-
-    onMounted(async () => {
-      try {
-        fetchFavorites()
-      } catch (error) {
-        console.log(error)
-      }
-    })
+    const favoritesStore = useFavoritesStore(),
+    { favorites } = storeToRefs(favoritesStore),
+    favoritesItems: ComputedRef<Product[]> = computed(() => favorites.value.map((object: Favorite) => object.product))
 
     return {
-      favorites, products, toggleFavorite
+      favoritesStore, favoritesItems
     }
   },
   render() {
@@ -51,8 +24,8 @@ export default defineComponent({
         </div>
         
         <CardList
-          items={ this.products }
-          onToggleFavorite={ (item: Product) => this.toggleFavorite(item) }
+          items={ this.favoritesItems }
+          onToggleFavorite={ (item: Product) => this.favoritesStore.removeFromFavorites(item) }
         />
       </>
     )
